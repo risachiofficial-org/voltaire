@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  bundler:
+  # docker pull ghcr.io/candidelabs/voltaire/voltaire-bundler:0.1.0a56
+    image: ghcr.io/candidelabs/voltaire/voltaire-bundler:0.1.0a56
+    container_name: voltaire-bundler
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - ":3000"
+    environment:
+      # Required: set your private key or mount a keystore and set VOLTAIRE_KEYSTORE_FILE_PATH
+      VOLTAIRE_BUNDLER_SECRET: "${VOLTAIRE_BUNDLER_SECRET}"
+
+      # RPC bind and port (inside container)
+      VOLTAIRE_RPC_URL: "0.0.0.0"
+      VOLTAIRE_RPC_PORT: "3000"
+
+      # Ethereum node URL(s). Defaults to host's 8545 via host.docker.internal on macOS/Windows.
+      VOLTAIRE_ETHEREUM_NODE_URL: "${VOLTAIRE_ETHEREUM_NODE_URL:-http://host.docker.internal:8545}"
+
+      # Chain ID (e.g., 8453 for Base mainnet). Defaults to 1337.
+      VOLTAIRE_CHAIN_ID: "${VOLTAIRE_CHAIN_ID:-1337}"
+
+      # Common runtime toggles
+      VOLTAIRE_UNSAFE: "${VOLTAIRE_UNSAFE:-true}"
+      VOLTAIRE_DISABLE_P2P: "${VOLTAIRE_DISABLE_P2P:-true}"
+      VOLTAIRE_RPC_CORS_DOMAIN: "${VOLTAIRE_RPC_CORS_DOMAIN:-*}"
+
+      # Optional: increase verbosity
+      VOLTAIRE_VERBOSE: "${VOLTAIRE_VERBOSE:-false}"
+
+      # Example: provide separate bundle-only node (uncomment and set)
+      # VOLTAIRE_BUNDLE_NODE_URL: "https://your-mev-protect-node" 
+
+      # Example: if using a keystore instead of private key (uncomment and set)
+      # VOLTAIRE_KEYSTORE_FILE_PATH: "/keystore/your-key.json"
+      # VOLTAIRE_KEYSTORE_FILE_PASSWORD: "${VOLTAIRE_KEYSTORE_FILE_PASSWORD:-}"
+
+    volumes:
+      - voltaire_cache:/app/cache
+      # Uncomment to mount a local keystore directory
+      # - ./keystore:/keystore:ro
+
+volumes:
+  voltaire_cache:
+
+
